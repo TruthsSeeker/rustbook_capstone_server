@@ -16,7 +16,7 @@ impl ThreadPool {
     /// 
     /// The size is the number of threads in the pool.
     /// 
-    /// # Panics
+    /// ## Panics
     /// 
     /// The `new` function will panic if the size is zero.
     pub fn new(size: usize) -> ThreadPool {
@@ -37,7 +37,7 @@ impl ThreadPool {
     /// 
     /// The size is the number of threads in the pool.
     /// 
-    /// # Errors
+    /// ## Errors
     /// 
     /// Returns a `PoolCreationError` if size is 0
     pub fn build(size: usize) -> Result<ThreadPool, PoolCreationError> {
@@ -57,6 +57,11 @@ impl ThreadPool {
         })
     }
 
+    /// Sends the closure as a job to the threadpool
+    /// 
+    ///  ## Panics
+    /// 
+    /// Panics if the sender is None or if the channel is closed
     pub fn execute<F>(&self, f:F)
     where
         F: FnOnce() + Send + 'static 
@@ -82,7 +87,7 @@ impl Drop for ThreadPool {
         drop(self.sender.take());
         for worker in &mut self.workers {
             println!("Shutting down worker {}", worker.id);
-            
+
             if let Some(thread) = worker.thread.take() {
                 thread.join().unwrap();
             }
